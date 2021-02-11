@@ -1,19 +1,27 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Observable;
 import java.util.ResourceBundle;
 
+
 import application.Main;
+import gui.util.Alerts;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
@@ -34,8 +42,9 @@ public class DepartmentListController implements Initializable{
 	private ObservableList<Department> obslist;
 	
 	@FXML
-	private void onBtNewAction() {
-		
+	private void onBtNewAction(ActionEvent event) {
+		Stage parentStage = gui.util.Utils.currentStage(event);
+		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
 	}
 	public void setDepartmentService(DepartmentService service) {
 		this.service = service;
@@ -66,6 +75,25 @@ public class DepartmentListController implements Initializable{
 		obslist = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obslist);
 		
+	}
+	private void createDialogForm(String absoluteName, Stage parentStage) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
+			Stage dialogeStage = new Stage();
+			dialogeStage.setTitle("Enter Depertment Data: ");
+			dialogeStage.setScene(new Scene(pane));
+			dialogeStage.setResizable(false);
+			dialogeStage.initOwner(parentStage);
+			dialogeStage.initModality(Modality.WINDOW_MODAL);
+			dialogeStage.showAndWait();
+			
+			
+		}catch(IOException e){
+			Alerts.showAlert("IOException!", "Error loading view", e.getMessage(), AlertType.ERROR);
+			
+			
+		}
 	}
 
 }
